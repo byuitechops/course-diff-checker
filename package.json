@@ -1,0 +1,19 @@
+{
+  "name": "course-diff-checker",
+  "version": "1.0.0",
+  "description": "Checks the difference between files in a parent course and child course",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/byuitechops/course-diff-checker.git"
+  },
+  "author": "Seth Bolander",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/byuitechops/course-diff-checker/issues"
+  },
+  "homepage": "https://github.com/byuitechops/course-diff-checker#readme"
+}
