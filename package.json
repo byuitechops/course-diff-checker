@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/byuitechops/course-diff-checker/issues"
   },
-  "homepage": "https://github.com/byuitechops/course-diff-checker#readme"
+  "homepage": "https://github.com/byuitechops/course-diff-checker#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "prettydiff": "^100.2.6"
+  }
 }
