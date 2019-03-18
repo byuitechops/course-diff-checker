@@ -1,8 +1,6 @@
 const cheerio = require('cheerio');
 
-function getDifferences() {
-
-}
+function getDifferences(srcFile, destFile) {}
 
 function unparseFiles() {
 
@@ -11,9 +9,11 @@ function unparseFiles() {
 function matchFiles(srcFiles, destFiles) {
     srcFiles.map(srcFile => {
         var matches = destFiles.filter(destFile => srcFile.title === destFile.title);
+
+        // NEEDS SOME WORK, ACCUM ISN'T AN ARRAY YA DUMB
         return matches.reduce((accum, match) => {
             accum[srcFile.title] = Array.isArray(accum[srcFile.title]) ? accum[srcFile.title] : [];
-            accum[srcFile.title] = getDiff(srcFile, match);
+            accum[srcFile.title] = getDifferences(srcFile, match);
             return accum;
         }, {});
     })
@@ -91,11 +91,9 @@ function parseFiles(courseObj) {
         var dom = cheerio.load(courseObj[key]);
         var file = {
             path: key,
-            dom: dom,
             title: getTitle(dom, key),
+            dom: removeTags(dom),
         };
-
-        file.dom = removeTags(file.dom);
 
         return file;
     });
@@ -103,11 +101,13 @@ function parseFiles(courseObj) {
     return courseFiles;
 }
 
-module.exports = function getDiff(src, dest) {
+module.exports = function (src, dest) {
     var differences = {};
 
     var parentFiles = parseFiles(src);
     var childFiles = parseFiles(dest);
+
+    var differences = matchFiles(parentFiles, childFiles);
 
     return differences;
 }

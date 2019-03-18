@@ -20,4 +20,6 @@ delete courseData.child['input\\seth-bolander-diff-test-child-export\\course_set
 // run diff checker
 getDiff(courseData.parent, courseData.child);
 
+// TODO: CHECK FOR GROUPS/SETTINGS IN COURSES AND RUN DIFF-CHECK
+
 /* PRINT RESULTS */
