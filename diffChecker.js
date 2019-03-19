@@ -19,14 +19,14 @@ function matchFiles(srcFiles, destFiles) {
     })
 }
 
-function removeTags($) {
-    var badIds = [
+function removeIds($) {
+    var ids = [
         'identifier',
         'ident',
         'identifierref',
         'id'
     ];
-    var badIdTags = [
+    var idAttributeTags = [
         'quiz',
         'file',
         'item',
@@ -42,7 +42,7 @@ function removeTags($) {
         'rubric',
         'resource'
     ];
-    var badTags = [
+    var idTags = [
         'topic_id',
         'assignment_group_identifierref',
         'rubric_identifierref',
@@ -53,47 +53,58 @@ function removeTags($) {
         'fieldentry'
     ];
 
-    badIdTags.forEach(idTag => {
-        badIds.forEach(id => {
+    idAttributeTags.forEach(idTag => {
+        ids.forEach(id => {
             $(idTag).removeAttr(id);
         });
     });
 
-    badTags.forEach(tag => {
+    idTags.forEach(tag => {
         $(tag).remove();
     });
 
     return $;
 }
 
-function getTitle(dom, key) {
-    var titles = [dom('lomimscc\\:title').text(),
+function getType(dom, path) {
+    var types = [
+        dom('assignmentGroups').get().length,
+        dom('topicMeta').get().length,
+        dom('webLink').get().length,
+        dom('topic').get().length,
+        dom('assignmentGroups').get().length,
+
+    ];
+    return 'quiz';
+}
+
+function getTitle(dom, path) {
+    var titles = [
+        dom('lomimscc\\:title').text(),
         dom('title').text(),
         dom('assessment').attr('title')
-    ]
+    ];
     titles = titles.filter(title => title !== '');
     if (titles.length > 0 || titles[0] !== undefined) {
         try {
             var titleOut = titles[0].trim();
         } catch (e) {
-            throw key;
+            throw path;
         }
     } else {
         var titleOut = '';
-        console.log(key);
+        console.log(path);
     }
 
     return titleOut;
 }
 
-function parseFiles(courseObj) {
-    var courseFiles = Object.keys(courseObj).map(key => {
-        var dom = cheerio.load(courseObj[key]);
-        var file = {
-            path: key,
-            title: getTitle(dom, key),
-            dom: removeTags(dom),
-        };
+function parseFiles(courseArray) {
+    var courseFiles = courseArray.map(file => {
+        var dom = cheerio.load(file.data);
+        file.title = getTitle(dom, file.path);
+        file.type = getType(dom, file.path);
+        file.dom = removeIds(dom);
 
         return file;
     });
@@ -102,12 +113,12 @@ function parseFiles(courseObj) {
 }
 
 module.exports = function (src, dest) {
-    var differences = {};
+    var differences = [];
 
     var parentFiles = parseFiles(src);
     var childFiles = parseFiles(dest);
 
-    var differences = matchFiles(parentFiles, childFiles);
+    // var differences = matchFiles(parentFiles, childFiles);
 
     return differences;
 }

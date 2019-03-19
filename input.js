@@ -12,8 +12,8 @@ const extension = 'xml';
 // Read all files? If ===false, 'const extension' is required. If ===true, 'const extension' not required.
 const searchAllFiles = false;
 
-var parent = {};
-var child = {};
+var parent = [];
+var child = [];
 
 // test if file extension === extension
 function isExtensionOf(file) {
@@ -31,11 +31,18 @@ function fromDir(startPath, course) {
             // recursively search all dir below startPath
             fromDir(filename, course);
         } else if (isExtensionOf(filename) && !searchAllFiles) {
-            // else read correctly extensioned file data to course object {'filename.ext': 'file data', ...}
-            course[filename] = fs.readFileSync(filename, 'utf-8');
+            // else read correctly extensioned file data to course array node [{path:'path/to/file.ext', data:'<xml>file data</xml>'}, ...]
+            course.push({
+                path: filename,
+                data: fs.readFileSync(filename, 'utf-8')
+            });
         } else if (searchAllFiles) {
             // if `searchAllFiles === true` read all files to course object
-            course[filename] = fs.readFileSync(filename, 'utf-8');
+            course.push({
+                path: filename,
+                data: fs.readFileSync(filename, 'utf-8'),
+                extension: filename.split('.').pop().toLowerCase()
+            });
         }
     }
 }
