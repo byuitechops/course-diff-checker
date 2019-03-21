@@ -21,36 +21,38 @@ function matchFiles(srcFiles, destFiles) {
 
 function removeIds($) {
     var ids = [
-        'identifier',
+        'id',
         'ident',
-        'identifierref',
-        'id'
+        'identifier',
+        'identifierref'
     ];
     var idAttributeTags = [
-        'quiz',
-        'file',
-        'item',
         'assessment',
-        'topicMeta',
         'assignment',
         'assignmentGroup',
         'course',
+        'file',
         'gradingStandard',
-        'learningOutcomeGroup',
+        'item',
         'learningOutcome',
+        'learningOutcomeGroup',
+        'manifest',
         'module',
+        'objectbank',
+        'quiz',
+        'resource',
         'rubric',
-        'resource'
+        'topicMeta'
     ];
     var idTags = [
-        'topic_id',
         'assignment_group_identifierref',
-        'rubric_identifierref',
-        'image_identifier_ref',
-        'identifierref',
-        'root_account_uuid',
+        'fieldentry',
         'content_id',
-        'fieldentry'
+        'identifierref',
+        'image_identifier_ref',
+        'root_account_uuid',
+        'rubric_identifierref',
+        'topic_id'
     ];
 
     idAttributeTags.forEach(idTag => {
@@ -63,19 +65,63 @@ function removeIds($) {
         $(tag).remove();
     });
 
+    if ($('meta').attr('name') == 'identifier') {
+        $('meta').removeAttr('content');
+    }
+
     return $;
 }
 
 function getType(dom, path) {
-    var types = [
-        dom('assignmentGroups').get().length,
-        dom('topicMeta').get().length,
-        dom('webLink').get().length,
-        dom('topic').get().length,
-        dom('assignmentGroups').get().length,
-
+    var numTypeTags = [
+        'assessment',
+        'assignment',
+        'assignmentGroups',
+        'course',
+        'gradingStandards',
+        'learningOutcomeGroup',
+        'manifest',
+        'media_tracks',
+        'modules',
+        'quiz',
+        'rubrics',
+        'topic',
+        'topicMeta',
+        'webLink'
     ];
-    return 'quiz';
+    var typeDirs = [
+        'external_content',
+        'non_cc_assignments',
+        'wiki_content'
+    ];
+
+    var type = '';
+
+    var assocTags = numTypeTags.filter(tag => dom(tag).get().length === 1);
+    if (assocTags.length === 1) {
+        type = assocTags[0];
+    } else if (assocTags.length > 1) {
+        if (dom('topicMeta').get().length > 0) {
+            type = 'topicMeta';
+        } else if (dom('quiz').get().length > 0) {
+            type = 'quiz';
+        } else {
+            type = 'unknown';
+            console.log(`More than one file type tag in file: ${path}`);
+        }
+    } else if (assocTags.length < 1) {
+        type = 'unknown';
+        console.log(`No file type tags in file: ${path}`);
+    }
+
+    typeDirs.forEach(dir => {
+        if (path.split('\\')[-2] == dir) {
+            type = dir;
+        }
+        return;
+    });
+
+    return type;
 }
 
 function getTitle(dom, path) {
@@ -101,7 +147,10 @@ function getTitle(dom, path) {
 
 function parseFiles(courseArray) {
     var courseFiles = courseArray.map(file => {
-        var dom = cheerio.load(file.data);
+        var dom = cheerio.load(file.data, {
+            normalizeWhitespace: true,
+            xmlMode: true
+        });
         file.title = getTitle(dom, file.path);
         file.type = getType(dom, file.path);
         file.dom = removeIds(dom);
