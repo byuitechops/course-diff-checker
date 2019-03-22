@@ -5,7 +5,11 @@ module.exports = function (input) {
         'input\\seth-bolander-diff-test-export\\course_settings\\media_tracks.xml',
         'input\\seth-bolander-diff-test-child-export\\course_settings\\media_tracks.xml',
         'input\\seth-bolander-diff-test-export\\course_settings\\assignment_groups.xml',
-        'input\\seth-bolander-diff-test-child-export\\course_settings\\assignment_groups.xml'
+        'input\\seth-bolander-diff-test-child-export\\course_settings\\assignment_groups.xml',
+        'input\\seth-bolander-diff-test-export\\course_settings\\course_settings.xml',
+        'input\\seth-bolander-diff-test-child-export\\course_settings\\course_settings.xml',
+        'input\\seth-bolander-diff-test-export\\course_settings\\grading_standards.xml',
+        'input\\seth-bolander-diff-test-child-export\\course_settings\\grading_standards.xml',
     ];
 
     var customDiffFiles = [];
