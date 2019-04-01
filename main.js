@@ -12,6 +12,4 @@ var courseData = getCustomDiffInput(input);
 // run diff checker
 getDiff(courseData.parent, courseData.child);
 
-// TODO: CHECK FOR GROUPS/SETTINGS IN COURSES AND RUN DIFF-CHECK
-
 /* PRINT RESULTS */

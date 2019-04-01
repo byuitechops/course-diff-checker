@@ -9,12 +9,37 @@ function unparseFiles() {
 }
 
 function matchFiles(srcFiles, destFiles) {
+    var pairs = [];
     srcFiles.map(srcFile => {
-        var matches = destFiles.filter(destFile => srcFile.title === destFile.title && srcFile.type === destFile.type);
-        if (matches.length !== 1) {
-            throw `No matches for ${srcFile.path}`
+        var matches = destFiles.filter(destFile => srcFile.title === destFile.title && srcFile.assessmentType === destFile.assessmentType);
+        if (matches.length === 1 && srcFile.type === matches[0].type) {
+            pairs.push({
+                src: srcFile,
+                dest: matches[0]
+            });
+        } else if (matches.length === 1 && srcFile.type !== matches[0].type) {
+            throw `Type error: src: ${srcFile.type}, dest: ${matches[0].type}\nsrcLocation: ${srcFile.path}\ndestLocation:${matches[0].path}`;
+        } else if (matches.length < 1) {
+            if (srcFile.title !== 'Unnamed Quiz') {
+                throw `No matches for ${srcFile.title}\nLocation: ${srcFile.path}`;
+            }
+        } else if (matches.length > 1) {
+            matches = matches.filter(destFile => srcFile.type === destFile.type);
+            if (matches.length === 1) {
+                pairs.push({
+                    src: srcFile,
+                    dest: matches[0]
+                });
+            } else if (matches.length < 1) {
+                throw `Type error: Multiple matching titles but no matching types for src: ${srcFile.type}`;
+            } else if (matches.length > 1) {
+                console.log(matches);
+                throw `Type error: Multiple matching titles and types for src: ${srcFile.type}`;
+            }
         }
     });
+
+    return pairs;
 }
 
 function removeIds($) {
@@ -50,7 +75,8 @@ function removeIds($) {
         'image_identifier_ref',
         'root_account_uuid',
         'rubric_identifierref',
-        'topic_id'
+        'topic_id',
+        'quiz_identifierref'
     ];
 
     idAttributeTags.forEach(idTag => {
@@ -68,6 +94,16 @@ function removeIds($) {
     }
 
     return $;
+}
+
+function getAssessmentType(path) {
+    if (path.slice(-7, -4) === 'eta') {
+        return 'meta';
+    } else if (path.slice(-7, -4) === 'qti') {
+        return 'qti';
+    } else {
+        return null;
+    }
 }
 
 function getType(dom, path) {
@@ -152,6 +188,7 @@ function parseFiles(courseArray) {
         file.title = getTitle(dom, file.path);
         file.type = getType(dom, file.path);
         file.dom = removeIds(dom);
+        file.assessmentType = getAssessmentType(file.path);
 
         return file;
     });

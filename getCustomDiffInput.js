@@ -10,6 +10,10 @@ module.exports = function (input) {
         'input\\seth-bolander-diff-test-child-export\\course_settings\\course_settings.xml',
         'input\\seth-bolander-diff-test-export\\course_settings\\grading_standards.xml',
         'input\\seth-bolander-diff-test-child-export\\course_settings\\grading_standards.xml',
+        'input\\seth-bolander-diff-test-export\\course_settings\\learning_outcomes.xml',
+        'input\\seth-bolander-diff-test-child-export\\course_settings\\learning_outcomes.xml',
+        'input\\seth-bolander-diff-test-export\\imsmanifest.xml',
+        'input\\seth-bolander-diff-test-child-export\\imsmanifest.xml',
     ];
 
     var customDiffFiles = [];
