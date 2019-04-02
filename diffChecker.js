@@ -4,18 +4,14 @@ function getDifferences(srcFile, destFile) {
 
 }
 
-function unparseFiles() {
-
-}
-
 function matchFiles(srcFiles, destFiles) {
     var pairs = [];
     srcFiles.map(srcFile => {
         var matches = destFiles.filter(destFile => srcFile.title === destFile.title && srcFile.assessmentType === destFile.assessmentType);
         if (matches.length === 1 && srcFile.type === matches[0].type) {
             pairs.push({
-                src: srcFile,
-                dest: matches[0]
+                srcFile: srcFile,
+                destFile: matches[0]
             });
         } else if (matches.length === 1 && srcFile.type !== matches[0].type) {
             throw `Type error: src: ${srcFile.type}, dest: ${matches[0].type}\nsrcLocation: ${srcFile.path}\ndestLocation:${matches[0].path}`;
@@ -27,14 +23,13 @@ function matchFiles(srcFiles, destFiles) {
             matches = matches.filter(destFile => srcFile.type === destFile.type);
             if (matches.length === 1) {
                 pairs.push({
-                    src: srcFile,
-                    dest: matches[0]
+                    srcFile: srcFile,
+                    destFile: matches[0]
                 });
             } else if (matches.length < 1) {
                 throw `Type error: Multiple matching titles but no matching types for src: ${srcFile.type}`;
             } else if (matches.length > 1) {
-                console.log(matches);
-                throw `Type error: Multiple matching titles and types for src: ${srcFile.type}`;
+                throw `Type error: Multiple matching titles and types for src: ${srcFile.type}\nmatches: ${matches}`;
             }
         }
     });
@@ -197,12 +192,12 @@ function parseFiles(courseArray) {
 }
 
 module.exports = function (src, dest) {
-    var differences = [];
-
     var parentFiles = parseFiles(src);
     var childFiles = parseFiles(dest);
+    var filePairs = matchFiles(parentFiles, childFiles);
+    filePairs.forEach(pair => {
+        pair.diff = getDifferences(pair.srcFile, pair.destFile);
+    });
 
-    var matchedFiles = matchFiles(parentFiles, childFiles);
-
-    return differences;
+    return filePairs;
 }
